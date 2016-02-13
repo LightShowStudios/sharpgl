@@ -80,6 +80,7 @@ namespace SharpGL.WPF
             // Lock on OpenGL.
             lock (gl)
             {
+                gl.MakeCurrent();
                 gl.SetDimensions(width, height);
 
                 //	Set the viewport.
