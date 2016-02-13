@@ -42,7 +42,7 @@ namespace SharpGL.WPF
             finally
             {
                 Win32.DeleteObject(hBitmap);
-                GC.Collect();
+                //GC.Collect();
             }
 
             return bitSrc;
