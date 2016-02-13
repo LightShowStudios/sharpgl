@@ -43,7 +43,10 @@ namespace SharpGL.WPF
 
             //  DispatcherTimer setup
             timer.Tick += new EventHandler(timer_Tick);
-            timer.Start();
+            if (RenderTrigger == RenderTrigger.TimerBased)
+            {
+                timer.Start();
+            }
         }
 
         /// <summary>
@@ -80,6 +83,7 @@ namespace SharpGL.WPF
             // Lock on OpenGL.
             lock (gl)
             {
+                gl.MakeCurrent();
                 gl.SetDimensions(width, height);
 
                 //	Set the viewport.
@@ -149,7 +153,15 @@ namespace SharpGL.WPF
         /// <param name="e">The <see cref="System.EventArgs"/> instance containing the event data.</param>
         void timer_Tick(object sender, EventArgs e)
         {
-            //  Lock on OpenGL.
+            DoRender();
+         }
+ 
+         /// <summary>
+         /// Executes the GL Render
+         /// </summary>
+         public void DoRender()
+         {
+           //  Lock on OpenGL.
             lock (gl)
             {
                 //  Start the stopwatch so that we can time the rendering.
@@ -269,6 +281,34 @@ namespace SharpGL.WPF
         /// A single event args for all our needs.
         /// </summary>
         private OpenGLEventArgs eventArgsFast;
+
+        /// <summary>
+         /// The Render trigger of this control
+         /// </summary>
+         public static readonly DependencyProperty RenderTriggerProperty =
+ DependencyProperty.Register("RenderMode", typeof(RenderTrigger), typeof(OpenGLControl),
+ new PropertyMetadata(RenderTrigger.TimerBased));
+
+        /// <summary>
+        /// Gets or sets the Render trigger of this control
+        /// </summary>
+        public RenderTrigger RenderTrigger
+        {
+            get { return (RenderTrigger) GetValue(RenderTriggerProperty); }
+            set
+            {
+                SetValue(RenderTriggerProperty, value);
+                if (value == RenderTrigger.TimerBased)
+                {
+                    timer.Start();
+                }
+                else
+                {
+                    timer.Stop();
+                }
+            }
+        }
+
 
         /// <summary>
         /// The OpenGL instance.
