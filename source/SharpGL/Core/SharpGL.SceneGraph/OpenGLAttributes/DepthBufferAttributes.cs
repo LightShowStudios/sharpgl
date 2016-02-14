@@ -49,7 +49,7 @@ namespace SharpGL.OpenGLAttributes
 
         private bool? enableDepthTest;
         private DepthFunction? depthFunction;
-        private float? depthClearValue;
+        private double? depthClearValue;
         private bool? enableDepthWritemask;
         
         /// <summary>
@@ -72,7 +72,7 @@ namespace SharpGL.OpenGLAttributes
         /// The depth clear value.
         /// </value>
         [Description(""), Category("Depth Buffer")]
-        public float? DepthClearValue
+        public double? DepthClearValue
         {
             get { return depthClearValue; }
             set { depthClearValue = value; }
