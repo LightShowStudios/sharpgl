@@ -24,7 +24,7 @@ namespace SharpGL.WPF
         {
             InitializeComponent();
 
-            timer = new DispatcherTimer();
+            timer = new DispatcherTimer(DispatcherPriority.Send);
 
             Unloaded += OpenGLControl_Unloaded;
             Loaded += OpenGLControl_Loaded;

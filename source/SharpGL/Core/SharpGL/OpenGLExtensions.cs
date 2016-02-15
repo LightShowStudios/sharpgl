@@ -1023,24 +1023,36 @@ namespace SharpGL
         }
         public void BufferData(uint target, float[] data, uint usage)
         {
-            IntPtr p = Marshal.AllocHGlobal(data.Length * sizeof(float));
-            Marshal.Copy(data, 0, p, data.Length);
+            var gcHandle = GCHandle.Alloc(data, GCHandleType.Pinned);
+            IntPtr p = gcHandle.AddrOfPinnedObject();
             GetDelegateFor<glBufferData>()(target, data.Length * sizeof(float), p, usage);
-            Marshal.FreeHGlobal(p);
+            gcHandle.Free();
         }
         public void BufferData(uint target, ushort[] data, uint usage)
         {
             var dataSize = data.Length * sizeof(ushort);
-            IntPtr p = Marshal.AllocHGlobal(dataSize);
-            var shortData = new short[data.Length];
-            Buffer.BlockCopy(data, 0, shortData, 0, dataSize);
-            Marshal.Copy(shortData, 0, p, data.Length);
+            var gcHandle = GCHandle.Alloc(data, GCHandleType.Pinned);
+            IntPtr p = gcHandle.AddrOfPinnedObject();
             GetDelegateFor<glBufferData>()(target, dataSize, p, usage);
-            Marshal.FreeHGlobal(p);
+            gcHandle.Free();
         }
         public void BufferSubData(uint target, int offset, int size, IntPtr data)
         {
             GetDelegateFor<glBufferSubData>()(target, offset, size, data);
+        }
+        public void BufferSubData(uint target, int offset, float[] data)
+        {
+            var gcHandle = GCHandle.Alloc(data, GCHandleType.Pinned);
+            var p = gcHandle.AddrOfPinnedObject();
+            GetDelegateFor<glBufferSubData>()(target, offset, data.Length * sizeof(float), p);
+            gcHandle.Free();
+        }
+        public void BufferSubData(uint target, int offset, ushort[] data)
+        {
+            var gcHandle = GCHandle.Alloc(data, GCHandleType.Pinned);
+            var p = gcHandle.AddrOfPinnedObject();
+            GetDelegateFor<glBufferSubData>()(target, offset, data.Length * sizeof(ushort), p);
+            gcHandle.Free();
         }
         public void GetBufferSubData(uint target, int offset, int size, IntPtr data)
         {
