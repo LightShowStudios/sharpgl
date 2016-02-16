@@ -8,6 +8,9 @@ namespace SharpGL.RenderContextProviders
 {
     public class HiddenWindowRenderContextProvider : RenderContextProvider
     {
+        private bool arbMultisampleSupported;
+        private int arbMultisampleFormat;
+
         /// <summary>
         /// Initializes a new instance of the <see cref="HiddenWindowRenderContextProvider"/> class.
         /// </summary>
@@ -72,10 +75,17 @@ namespace SharpGL.RenderContextProviders
 		
 		    //	Match an appropriate pixel format 
 		    int iPixelformat;
-		    if((iPixelformat = Win32.ChoosePixelFormat(deviceContextHandle, pfd)) == 0 )
-			    return false;
+            if (!this.arbMultisampleSupported)
+            {
+                if ((iPixelformat = Win32.ChoosePixelFormat(deviceContextHandle, pfd)) == 0)
+                    return false;
+            }
+            else
+            {
+                iPixelformat = arbMultisampleFormat;
+            }
 
-		    //	Sets the pixel format
+            //	Sets the pixel format
             if (Win32.SetPixelFormat(deviceContextHandle, iPixelformat, pfd) == 0)
 		    {
 			    return false;
@@ -87,11 +97,111 @@ namespace SharpGL.RenderContextProviders
             //  Make the context current.
             MakeCurrent();
 
+            //if (!arbMultisampleSupported)
+            //{
+            //    if (InitMultisample(deviceContextHandle, gl, pfd))
+            //    {
+            //        this.Destroy();
+            //        return this.Create(openGLVersion, gl, width, height, bitDepth, parameter);
+            //    }
+            //}
+
             //  Update the context if required.
             UpdateContextVersion(gl);
 
             //  Return success.
             return true;
+        }
+
+        // WGLisExtensionSupported: This Is A Form Of The Extension For WGL
+        private bool WGLisExtensionSupported(OpenGL gl, string extension)
+        {
+
+            var extlen = extension.Length;
+            string supported = null;
+
+            supported = gl.GetExtensionsStringARB();
+            // Try To Use wglGetExtensionStringARB On Current DC, If Possible
+
+            // If That Failed, Try Standard Opengl Extensions String
+            if (supported == null) supported = gl.GetString(OpenGL.GL_EXTENSIONS);
+
+            // If That Failed Too, Must Be No Extensions Supported
+            if (supported == null) return false;
+
+            return true;
+            // Begin Examination At Start Of String, Increment By 1 On False Match
+        }
+
+        // InitMultisample: Used To Query The Multisample Frequencies
+private bool InitMultisample(IntPtr hdc, OpenGL gl, Win32.PIXELFORMATDESCRIPTOR pfd)
+        {
+            //See If The String Exists In WGL!
+            if (!this.WGLisExtensionSupported(gl, "WGL_ARB_multisample"))
+            {
+                arbMultisampleSupported = false;
+                return false;
+            }
+
+            //// Get Our Pixel Format
+            //PFNWGLCHOOSEPIXELFORMATARBPROC wglChoosePixelFormatARB = (PFNWGLCHOOSEPIXELFORMATARBPROC)wglGetProcAddress("wglChoosePixelFormatARB");
+            //if (!wglChoosePixelFormatARB)
+            //{
+            //    arbMultisampleSupported = false;
+            //    return false;
+            //}
+
+            // Get Our Current Device Context
+            //HDC hDC = GetDC(hWnd);
+
+            int pixelFormat = 0;
+            bool valid;
+            uint numFormats = 0;
+            float[] fAttributes = {0f, 0f};
+
+            // These Attributes Are The Bits We Want To Test For In Our Sample
+            // Everything Is Pretty Standard, The Only One We Want To 
+            // Really Focus On Is The SAMPLE BUFFERS ARB And WGL SAMPLES
+            // These Two Are Going To Do The Main Testing For Whether Or Not
+            // We Support Multisampling On This Hardware.
+            int[] iAttributes =
+            {
+                (int) OpenGL.WGL_DRAW_TO_WINDOW_ARB, (int) OpenGL.GL_TRUE,
+                (int) OpenGL.WGL_SUPPORT_OPENGL_ARB, (int) OpenGL.GL_TRUE,
+                (int) OpenGL.WGL_ACCELERATION_ARB, (int) OpenGL.WGL_FULL_ACCELERATION_ARB,
+                (int) OpenGL.WGL_COLOR_BITS_ARB, 24,
+                (int) OpenGL.WGL_ALPHA_BITS_ARB, 8,
+                (int) OpenGL.WGL_DEPTH_BITS_ARB, 16,
+                (int) OpenGL.WGL_STENCIL_BITS_ARB, 0,
+                (int) OpenGL.WGL_DOUBLE_BUFFER_ARB, (int) OpenGL.GL_TRUE,
+                (int) OpenGL.WGL_SAMPLE_BUFFERS_ARB, (int) OpenGL.GL_TRUE,
+                (int) OpenGL.WGL_SAMPLES_ARB, 4,
+                0, 0
+            };
+
+            // First We Check To See If We Can Get A Pixel Format For 4 Samples
+            valid = gl.ChoosePixelFormatARB(hdc, iAttributes, fAttributes, 1, ref pixelFormat, ref numFormats);
+
+            // If We Returned True, And Our Format Count Is Greater Than 1
+            if (valid && numFormats >= 1)
+            {
+                arbMultisampleSupported = true;
+                arbMultisampleFormat = pixelFormat;
+                return arbMultisampleSupported;
+            }
+
+            // Our Pixel Format With 4 Samples Failed, Test For 2 Samples
+            iAttributes[19] = 2;
+            valid = gl.ChoosePixelFormatARB(hdc, iAttributes, fAttributes, 1, ref pixelFormat, ref numFormats);
+            if (valid && numFormats >= 1)
+            {
+                arbMultisampleSupported = true;
+                arbMultisampleFormat = pixelFormat;
+                return arbMultisampleSupported;
+            }
+
+            // Return The Valid Format
+            return arbMultisampleSupported;
         }
 
         private static Win32.WndProc wndProcDelegate = new Win32.WndProc(WndProc);
@@ -101,16 +211,21 @@ namespace SharpGL.RenderContextProviders
             return Win32.DefWindowProc(hWnd, msg, wParam, lParam);
         }
 
+        private void DestroyWindow()
+        {
+            //	Release the device context.
+            Win32.ReleaseDC(windowHandle, deviceContextHandle);
+
+            //	Destroy the window.
+            Win32.DestroyWindow(windowHandle);
+        }
+
         /// <summary>
         /// Destroys the render context provider instance.
         /// </summary>
 	    public override void Destroy()
 	    {
-		    //	Release the device context.
-		    Win32.ReleaseDC(windowHandle, deviceContextHandle);
-
-		    //	Destroy the window.
-		    Win32.DestroyWindow(windowHandle);
+		    this.DestroyWindow();
 
 		    //	Call the base, which will delete the render context handle.
             base.Destroy();

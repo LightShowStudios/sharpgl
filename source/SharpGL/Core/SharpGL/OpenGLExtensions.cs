@@ -2959,6 +2959,101 @@ namespace SharpGL
 
         #endregion
 
+        #region WGL_ARB_multisample
+
+        public const uint WGL_SAMPLE_BUFFERS_ARB = 0x2041;
+        public const uint WGL_SAMPLES_ARB = 0x2042;
+
+        #endregion
+
+        #region WGL_ARB_pixel_format
+
+        // Methods
+        public bool GetPixelFormatAttribvARB(IntPtr hdc, int iPixelFormat, int iLayerPlane, uint nAttributes,
+            int[] piAttributes, int[] piValues)
+        {
+            return GetDelegateFor<wglGetPixelFormatAttribivARB>()(hdc, iPixelFormat, iLayerPlane, nAttributes,
+                piAttributes, piValues);
+        }
+        public bool GetPixelFormatAttribvARB(IntPtr hdc, int iPixelFormat, int iLayerPlane, uint nAttributes,
+            int[] piAttributes, float[] pfValues)
+        {
+            return GetDelegateFor<wglGetPixelFormatAttribfvARB>()(hdc, iPixelFormat, iLayerPlane, nAttributes,
+                piAttributes, pfValues);
+        }
+
+        public bool ChoosePixelFormatARB(IntPtr hdc, int[] piAttribIList, float[] pfAttribFList, uint nMaxFormats,
+            ref int piFormats, ref uint nNumFormats)
+        {
+            return GetDelegateFor<wglChoosePixelFormatARB>()(hdc, piAttribIList, pfAttribFList, nMaxFormats, ref piFormats,
+                ref nNumFormats);
+        }
+
+        //  Delegates
+        private delegate bool wglGetPixelFormatAttribivARB(
+            IntPtr hdc, int iPixelFormat, int iLayerPlane, uint nAttributes,
+            int[] piAttributes, int[] piValues);
+
+        private delegate bool wglGetPixelFormatAttribfvARB(
+            IntPtr hdc, int iPixelFormat, int iLayerPlane, uint nAttributes,
+            int[] piAttributes, float[] pfValues);
+
+        private delegate bool wglChoosePixelFormatARB(
+            IntPtr hdc, int[] piAttribIList, float[] pfAttribFList, uint nMaxFormats,
+            ref int piFormats, ref uint nNumFormats);
+
+        // Constants
+        public const uint WGL_NUMBER_PIXEL_FORMATS_ARB = 0x2000;
+        public const uint WGL_DRAW_TO_WINDOW_ARB = 0x2001;
+        public const uint WGL_DRAW_TO_BITMAP_ARB = 0x2002;
+        public const uint WGL_ACCELERATION_ARB = 0x2003;
+        public const uint WGL_NEED_PALETTE_ARB = 0x2004;
+        public const uint WGL_NEED_SYSTEM_PALETTE_ARB = 0x2005;
+        public const uint WGL_SWAP_LAYER_BUFFERS_ARB = 0x2006;
+        public const uint WGL_SWAP_METHOD_ARB = 0x2007;
+        public const uint WGL_NUMBER_OVERLAYS_ARB = 0x2008;
+        public const uint WGL_NUMBER_UNDERLAYS_ARB = 0x2009;
+        public const uint WGL_TRANSPARENT_ARB = 0x200A;
+        public const uint WGL_TRANSPARENT_RED_VALUE_ARB = 0x2037;
+        public const uint WGL_TRANSPARENT_GREEN_VALUE_ARB = 0x2038;
+        public const uint WGL_TRANSPARENT_BLUE_VALUE_ARB = 0x2039;
+        public const uint WGL_TRANSPARENT_ALPHA_VALUE_ARB = 0x203A;
+        public const uint WGL_TRANSPARENT_INDEX_VALUE_ARB = 0x203B;
+        public const uint WGL_SHARE_DEPTH_ARB = 0x200C;
+        public const uint WGL_SHARE_STENCIL_ARB = 0x200D;
+        public const uint WGL_SHARE_ACCUM_ARB = 0x200E;
+        public const uint WGL_SUPPORT_GDI_ARB = 0x200F;
+        public const uint WGL_SUPPORT_OPENGL_ARB = 0x2010;
+        public const uint WGL_DOUBLE_BUFFER_ARB = 0x2011;
+        public const uint WGL_STEREO_ARB = 0x2012;
+        public const uint WGL_PIXEL_TYPE_ARB = 0x2013;
+        public const uint WGL_COLOR_BITS_ARB = 0x2014;
+        public const uint WGL_RED_BITS_ARB = 0x2015;
+        public const uint WGL_RED_SHIFT_ARB = 0x2016;
+        public const uint WGL_GREEN_BITS_ARB = 0x2017;
+        public const uint WGL_GREEN_SHIFT_ARB = 0x2018;
+        public const uint WGL_BLUE_BITS_ARB = 0x2019;
+        public const uint WGL_BLUE_SHIFT_ARB = 0x201A;
+        public const uint WGL_ALPHA_BITS_ARB = 0x201B;
+        public const uint WGL_ALPHA_SHIFT_ARB = 0x201C;
+        public const uint WGL_ACCUM_BITS_ARB = 0x201D;
+        public const uint WGL_ACCUM_RED_BITS_ARB = 0x201E;
+        public const uint WGL_ACCUM_GREEN_BITS_ARB = 0x201F;
+        public const uint WGL_ACCUM_BLUE_BITS_ARB = 0x2020;
+        public const uint WGL_ACCUM_ALPHA_BITS_ARB = 0x2021;
+        public const uint WGL_DEPTH_BITS_ARB = 0x2022;
+        public const uint WGL_STENCIL_BITS_ARB = 0x2023;
+        public const uint WGL_AUX_BUFFERS_ARB = 0x2024;
+        public const uint WGL_NO_ACCELERATION_ARB = 0x2025;
+        public const uint WGL_GENERIC_ACCELERATION_ARB = 0x2026;
+        public const uint WGL_FULL_ACCELERATION_ARB = 0x2027;
+        public const uint WGL_SWAP_EXCHANGE_ARB = 0x2028;
+        public const uint WGL_SWAP_COPY_ARB = 0x2029;
+        public const uint WGL_SWAP_UNDEFINED_ARB = 0x202A;
+        public const uint WGL_TYPE_RGBA_ARB = 0x202B;
+        public const uint WGL_TYPE_COLORINDEX_ARB = 0x202C;
+        #endregion
+
         #region GL_ARB_texture_env_add
 
         //  Appears to not have any functionality
