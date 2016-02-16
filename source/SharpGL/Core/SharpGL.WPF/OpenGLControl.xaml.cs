@@ -81,7 +81,7 @@ namespace SharpGL.WPF
         {
             SizeChangedEventArgs e;
             // Lock on OpenGL.
-            lock (gl)
+            //lock (gl)
             {
                 gl.MakeCurrent();
                 gl.SetDimensions(width, height);
@@ -121,7 +121,7 @@ namespace SharpGL.WPF
             base.OnApplyTemplate();
 
             //  Lock on OpenGL.
-            lock (gl)
+            //lock (gl)
             {
                 //  Create OpenGL.
                 gl.Create(OpenGLVersion, RenderContextType, 1, 1, 32, null);
@@ -162,7 +162,7 @@ namespace SharpGL.WPF
          public void DoRender()
          {
            //  Lock on OpenGL.
-            lock (gl)
+            //lock (gl)
             {
                 //  Start the stopwatch so that we can time the rendering.
                 stopwatch.Restart();
@@ -173,9 +173,16 @@ namespace SharpGL.WPF
                 //	If there is a draw handler, then call it.
                 var handler = OpenGLDraw;
                 if (handler != null)
+                {
+                    this.eventArgsFast.CancelRender = false;
                     handler(this, eventArgsFast);
-                else
-                    gl.Clear(OpenGL.GL_COLOR_BUFFER_BIT);
+                    if (this.eventArgsFast.CancelRender)
+                    {
+                        this.eventArgsFast.CancelRender = false;
+                        return;
+                    }
+                }
+                else gl.Clear(OpenGL.GL_COLOR_BUFFER_BIT);
 
                 //  Draw the FPS.
                 if (DrawFPS)

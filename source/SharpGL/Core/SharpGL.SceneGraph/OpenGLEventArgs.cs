@@ -33,6 +33,8 @@ namespace SharpGL.SceneGraph
             get { return gl; }
             private set { gl = value; }
         }
+
+        public bool CancelRender { get; set; }
     }
 
     /// <summary>
