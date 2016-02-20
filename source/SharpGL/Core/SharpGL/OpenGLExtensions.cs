@@ -1063,6 +1063,15 @@ namespace SharpGL
             GetDelegateFor<glBufferSubData>()(target, offset, data.Length * sizeof(ushort), p);
             gcHandle.Free();
         }
+
+        public void BufferSubData(uint target, int offset, byte[] data)
+        {
+            var gcHandle = GCHandle.Alloc(data, GCHandleType.Pinned);
+            var p = gcHandle.AddrOfPinnedObject();
+            GetDelegateFor<glBufferSubData>()(target, offset, data.Length * sizeof(byte), p);
+            gcHandle.Free();
+        }
+
         public void GetBufferSubData(uint target, int offset, int size, IntPtr data)
         {
             GetDelegateFor<glGetBufferSubData>()(target, offset, size, data);
