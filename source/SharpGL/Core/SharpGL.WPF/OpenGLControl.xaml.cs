@@ -47,6 +47,15 @@ namespace SharpGL.WPF
             {
                 timer.Start();
             }
+            else if (RenderTrigger == RenderTrigger.FrameBased)
+            {
+                CompositionTarget.Rendering += CompositionTarget_Rendering;
+            }
+        }
+
+        private void CompositionTarget_Rendering(object sender, EventArgs e)
+        {
+            this.DoRender();
         }
 
         /// <summary>
@@ -60,6 +69,8 @@ namespace SharpGL.WPF
 
             timer.Stop();
             timer.Tick -= timer_Tick;
+
+            CompositionTarget.Rendering -= this.CompositionTarget_Rendering;
         }
 
         /// <summary>
@@ -293,7 +304,7 @@ namespace SharpGL.WPF
          /// The Render trigger of this control
          /// </summary>
          public static readonly DependencyProperty RenderTriggerProperty =
- DependencyProperty.Register("RenderMode", typeof(RenderTrigger), typeof(OpenGLControl),
+ DependencyProperty.Register("RenderTrigger", typeof(RenderTrigger), typeof(OpenGLControl),
  new PropertyMetadata(RenderTrigger.TimerBased));
 
         /// <summary>
@@ -312,6 +323,15 @@ namespace SharpGL.WPF
                 else
                 {
                     timer.Stop();
+                }
+
+                if (value == RenderTrigger.FrameBased)
+                {
+                    CompositionTarget.Rendering += this.CompositionTarget_Rendering;
+                }
+                else
+                {
+                    CompositionTarget.Rendering -= this.CompositionTarget_Rendering;
                 }
             }
         }

@@ -16,5 +16,10 @@
         /// Rendering must be performed manually by using the DoRender function.
         /// </summary>
         Manual,
+
+        /// <summary>
+        /// Rendering will be performed on every render frame.
+        /// </summary>
+        FrameBased
     }
 }
