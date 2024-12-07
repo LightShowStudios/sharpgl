@@ -36,3 +36,6 @@ extensions/build/SharpGL.2010.vsix
 extensions/build/SharpGL.vsix
 extensions/Seeds/packages
 *.GhostDoc.xml
+/.vs/sharpgl/FileContentIndex
+/.vs
+/source/SharpGL/.vs/SharpGL/FileContentIndex
